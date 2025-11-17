@@ -1,0 +1,20 @@
+# Ignorar configuraciones de entorno
+.env
+
+# Carpetas de IDE
+.idea/
+.vscode/
+
+# Archivos temporales
+*.log
+*.tmp
+.DS_Store
+
+# Vendors (si usáramos composer luego)
+vendor/
+
+# Node, por si se usa Bootstrap compilado
+node_modules/
+
+# Cualquier archivo SQL que sea exportado luego
+/*.sql
