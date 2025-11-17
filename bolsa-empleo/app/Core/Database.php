@@ -1,0 +1,38 @@
+<?php
+declare(strict_types=1);
+
+namespace App\Core;
+
+use PDO;
+use PDOException;
+
+class Database
+{
+    private static ?PDO $connection = null;
+
+    private function __construct() {}
+
+    public static function getConnection(): PDO
+    {
+        if (self::$connection === null) {
+            $config = require __DIR__ . '/../Config/config.php';
+            $host = $config['db']['host'];
+            $db   = $config['db']['name'];
+            $user = $config['db']['user'];
+            $pass = $config['db']['pass'];
+
+            $dsn = "mysql:host={$host};dbname={$db};charset=utf8mb4";
+            try {
+                self::$connection = new PDO($dsn, $user, $pass, [
+                    PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+                    PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+                    PDO::ATTR_EMULATE_PREPARES => false,
+                ]);
+            } catch (PDOException $e) {
+                die('Error conectando a la base de datos: ' . $e->getMessage());
+            }
+        }
+
+        return self::$connection;
+    }
+}
