@@ -1,0 +1,46 @@
+/* public/assets/css/app.css */
+
+/* Paleta de Colores Base */
+:root {
+    --color-primary: #8a2be2; /* Lavanda suave (violeta) */
+    --color-success: #3cb371; /* Verde menta/esmeralda para botones de acción */
+    --color-pink: #ffb6c1; /* Rosa claro para fondos o detalles */
+    --color-secondary: #a9a9a9; /* Gris suave */
+}
+
+/* Estilos de la Navegación */
+.navbar {
+    background-color: var(--color-primary) !important; /* Barra principal en Lavanda */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+.navbar-brand, .nav-link {
+    color: white !important;
+}
+
+/* Botón Principal (Registro/Acción) */
+.btn-success {
+    background-color: var(--color-success);
+    border-color: var(--color-success);
+    transition: background-color 0.3s;
+}
+.btn-success:hover {
+    background-color: #3cb371; /* Tono ligeramente más oscuro */
+    border-color: #3cb371;
+}
+
+/* Estilos de Autenticación (Fondo Suave) */
+body.auth-page {
+    background-color: var(--color-pink) !important; 
+}
+.auth-container {
+    background-color: white;
+    border-radius: 15px;
+    padding: 30px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+/* Títulos */
+h2 {
+    color: var(--color-primary);
+    font-weight: 600;
+}

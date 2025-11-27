@@ -1,63 +1,100 @@
 <?php
-declare(strict_types=1);
+// app/Services/AuthService.php
 
 namespace App\Services;
 
 use App\Models\Repositories\UsuarioRepositoryInterface;
+use App\Models\Repositories\PostulanteRepositoryInterface;
+use App\Models\Repositories\PersonaRepositoryInterface;
+
 use App\Models\Entities\Usuario;
+use App\Models\Entities\Persona;
+use App\Models\Entities\Postulante;
+use App\Models\Entities\PersonaPostulante;
 
 class AuthService
 {
-    private UsuarioRepositoryInterface $repo;
+    private UsuarioRepositoryInterface $usuarioRepository;
+    private PostulanteRepositoryInterface $postulanteRepository;
+    private PersonaRepositoryInterface $personaRepository;
 
-    public function __construct(UsuarioRepositoryInterface $repo)
-    {
-        $this->repo = $repo;
+    public function __construct(
+        UsuarioRepositoryInterface $usuarioRepository,
+        PostulanteRepositoryInterface $postulanteRepository,
+        PersonaRepositoryInterface $personaRepository
+    ) {
+        $this->usuarioRepository = $usuarioRepository;
+        $this->postulanteRepository = $postulanteRepository;
+        $this->personaRepository = $personaRepository;
     }
 
-    public function registrar(string $username, string $email, string $password): int
+    public function register(array $data): ?Postulante
     {
-        // Validaciones básicas
-        if (empty($username) || empty($email) || empty($password)) {
-            throw new \InvalidArgumentException('Campos obligatorios vacíos.');
+        $idTipo = (int)($data['id_tipo_postulante'] ?? 1);
+
+        // 1. Validaciones
+        if ($this->usuarioRepository->findByEmail($data['email'])) {
+            throw new \Exception("El email ya existe.");
+        }
+        if ($idTipo < 4 && $this->personaRepository->findByDni($data['dni'] ?? '')) {
+             throw new \Exception("El DNI ya está registrado.");
+        }
+        
+        // 2. Usuario
+        $passwordHash = password_hash($data['password'], PASSWORD_DEFAULT);
+        $usuario = (new Usuario())
+                ->setUsername($data['username'])
+                ->setEmail($data['email'])
+                ->setPasswordHash($passwordHash)
+                ->setActivo(true);
+        
+        if (!$this->usuarioRepository->save($usuario)) {
+            throw new \Exception("Error al guardar credenciales.");
+        }
+        
+        // 3. Entidad Base
+        $postulanteBase = null;
+        
+        if ($idTipo < 4) { 
+            $persona = (new Persona())
+                    ->setNombre($data['nombre'])
+                    ->setApellido($data['apellido'])
+                    ->setDni($data['dni'])
+                    ->setEmailContacto($data['email']);
+            
+            if (!$this->personaRepository->save($persona)) {
+                throw new \Exception("Error al guardar datos personales.");
+            }
+            
+            $postulanteBase = new PersonaPostulante($persona); 
+            $postulanteBase->setIdUsuario($usuario->getIdUsuario());
+            
+        } elseif ($idTipo === 4) { 
+            throw new \Exception("Registro de empresa no implementado aquí.");
+        }
+        
+        // 4. Postulante
+        if ($postulanteBase && $this->postulanteRepository->save($postulanteBase)) {
+            return $postulanteBase;
         }
 
-        if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-            throw new \InvalidArgumentException('Email inválido.');
-        }
-
-        if ($this->repo->buscarPorEmail($email)) {
-            throw new \RuntimeException('El email ya está en uso.');
-        }
-
-        if ($this->repo->buscarPorUsername($username)) {
-            throw new \RuntimeException('El username ya está en uso.');
-        }
-
-        $hash = password_hash($password, PASSWORD_DEFAULT);
-        $usuario = new Usuario(null, $username, $email, $hash, date('Y-m-d H:i:s'), 1);
-        return $this->repo->guardar($usuario);
+        throw new \Exception("Error al crear el vínculo postulante.");
     }
-
-    public function login(string $emailOrUsername, string $password): Usuario
+    
+    public function login(string $usernameOrEmail, string $password): ?Postulante
     {
-        // Permitir login por email o username
-        $usuario = filter_var($emailOrUsername, FILTER_VALIDATE_EMAIL)
-            ? $this->repo->buscarPorEmail($emailOrUsername)
-            : $this->repo->buscarPorUsername($emailOrUsername);
-
+        // 1. Buscar
+        $usuario = $this->usuarioRepository->findByUsername($usernameOrEmail);
         if (!$usuario) {
-            throw new \RuntimeException('Credenciales inválidas.');
+            $usuario = $this->usuarioRepository->findByEmail($usernameOrEmail);
         }
 
-        if (!password_verify($password, $usuario->getPasswordHash())) {
-            throw new \RuntimeException('Credenciales inválidas.');
+        // 2. Verificar (Si no existe o pass incorrecta, retorna null)
+        if (!$usuario || !$usuario->verifyPassword($password)) {
+            return null; 
         }
-
-        if (!$usuario->isActivo()) {
-            throw new \RuntimeException('Usuario inactivo.');
-        }
-
-        return $usuario;
+        
+        // 3. Retornar Postulante
+        return $this->postulanteRepository->findByUserId($usuario->getIdUsuario());
     }
 }

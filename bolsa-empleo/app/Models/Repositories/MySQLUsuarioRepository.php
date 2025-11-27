@@ -1,68 +1,127 @@
 <?php
-declare(strict_types=1);
+// app/Models/Repositories/MySQLUsuarioRepository.php
 
 namespace App\Models\Repositories;
 
-use App\Models\Entities\Usuario;
+use App\Core\Database; // Clase para obtener la conexión PDO
+use App\Models\Entities\Usuario; // Entidad de dominio
 use PDO;
 
 class MySQLUsuarioRepository implements UsuarioRepositoryInterface
 {
-    private PDO $pdo;
+    // Propiedad para almacenar la conexión PDO
+    private PDO $db; 
 
-    public function __construct(PDO $pdo)
+    public function __construct()
     {
-        $this->pdo = $pdo;
+        // Obtiene la conexión PDO segura del Singleton Database
+        // Esta es la primera línea de código ejecutable dentro del constructor.
+        $this->db = Database::getInstance()->getConnection();
+    }
+    
+    //---------------------------------------------------------
+    // BÚSQUEDA (Finders)
+    //---------------------------------------------------------
+
+    public function findById(int $id): ?Usuario 
+    {
+        $stmt = $this->db->prepare('SELECT * FROM usuarios WHERE id_usuario = ?');
+        $stmt->execute([$id]);
+        $data = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        return $data ? $this->mapToEntity($data) : null;
+    }
+    
+    public function findByUsername(string $username): ?Usuario 
+    {
+        // Consulta para el login
+        $stmt = $this->db->prepare('SELECT * FROM usuarios WHERE username = ?');
+        $stmt->execute([$username]);
+        $data = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        return $data ? $this->mapToEntity($data) : null;
+    }
+    
+    public function findByEmail(string $email): ?Usuario 
+    {
+        // Consulta para verificar unicidad de email
+        $stmt = $this->db->prepare('SELECT * FROM usuarios WHERE email = ?');
+        $stmt->execute([$email]);
+        $data = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        return $data ? $this->mapToEntity($data) : null;
     }
 
-    public function guardar(Usuario $usuario): int
+    //---------------------------------------------------------
+    // PERSISTENCIA
+    //---------------------------------------------------------
+
+    /**
+     * Guarda un nuevo usuario en la base de datos (Usado en el registro).
+     */
+    public function save(Usuario $usuario): bool
     {
-        $sql = "INSERT INTO usuarios (username, email, password_hash) VALUES (:username, :email, :password_hash)";
-        $stmt = $this->pdo->prepare($sql);
-        $stmt->execute([
-            ':username' => $usuario->getUsername(),
-            ':email' => $usuario->getEmail(),
-            ':password_hash' => $usuario->getPasswordHash()
+        // Se incluyen activo y fecha_alta ya que son NOT NULL [cite: 449, 450]
+        $sql = 'INSERT INTO usuarios (username, email, password_hash, activo, fecha_alta) 
+                VALUES (?, ?, ?, ?, ?)';
+        
+        $stmt = $this->db->prepare($sql);
+
+        $success = $stmt->execute([
+            $usuario->getUsername(),
+            $usuario->getEmail(),
+            $usuario->getPasswordHash(),
+            $usuario->isActivo(), 
+            $usuario->getFechaAlta()->format('Y-m-d H:i:s') 
         ]);
-        return (int)$this->pdo->lastInsertId();
-    }
 
-    private function mapRowToUsuario(array $row): Usuario
-    {
-        return new Usuario(
-            (int)$row['id_usuario'],
-            $row['username'],
-            $row['email'],
-            $row['password_hash'],
-            $row['fecha_alta'] ?? date('Y-m-d H:i:s'),
-            (int)($row['activo'] ?? 1)
-        );
+        if ($success) {
+            $usuario->setIdUsuario((int)$this->db->lastInsertId());
+        }
+        return $success;
     }
-
-    public function buscarPorEmail(string $email): ?Usuario
+    
+    /**
+     * Actualiza los datos de un usuario existente.
+     */
+    public function update(Usuario $usuario): bool
     {
-        $sql = "SELECT * FROM usuarios WHERE email = :email LIMIT 1";
-        $stmt = $this->pdo->prepare($sql);
-        $stmt->execute([':email' => $email]);
-        $row = $stmt->fetch(PDO::FETCH_ASSOC);
-        return $row ? $this->mapRowToUsuario($row) : null;
+        if ($usuario->getIdUsuario() === null) {
+            return false;
+        }
+
+        $sql = 'UPDATE usuarios SET 
+                username = ?, email = ?, password_hash = ?, activo = ?
+                WHERE id_usuario = ?';
+        
+        $stmt = $this->db->prepare($sql);
+        
+        return $stmt->execute([
+            $usuario->getUsername(),
+            $usuario->getEmail(),
+            $usuario->getPasswordHash(),
+            $usuario->isActivo(),
+            $usuario->getIdUsuario() 
+        ]);
     }
+    
+    //---------------------------------------------------------
+    // MAPEADOR (MAPPER)
+    //---------------------------------------------------------
 
-    public function buscarPorUsername(string $username): ?Usuario
+    /**
+     * Convierte un array asociativo de la DB en un objeto Usuario.
+     */
+    private function mapToEntity(array $data): Usuario
     {
-        $sql = "SELECT * FROM usuarios WHERE username = :username LIMIT 1";
-        $stmt = $this->pdo->prepare($sql);
-        $stmt->execute([':username' => $username]);
-        $row = $stmt->fetch(PDO::FETCH_ASSOC);
-        return $row ? $this->mapRowToUsuario($row) : null;
-    }
-
-    public function buscarPorId(int $id): ?Usuario
-    {
-        $sql = "SELECT * FROM usuarios WHERE id_usuario = :id LIMIT 1";
-        $stmt = $this->pdo->prepare($sql);
-        $stmt->execute([':id' => $id]);
-        $row = $stmt->fetch(PDO::FETCH_ASSOC);
-        return $row ? $this->mapRowToUsuario($row) : null;
+        $usuario = new Usuario();
+        $usuario->setIdUsuario((int)$data['id_usuario'])
+                ->setUsername($data['username'])
+                ->setEmail($data['email'])
+                ->setPasswordHash($data['password_hash'])
+                // Convertir datetime/booleanos
+                ->setFechaAlta(new \DateTimeImmutable($data['fecha_alta']))
+                ->setActivo((bool)$data['activo']); 
+        return $usuario;
     }
 }
