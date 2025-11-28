@@ -1,36 +1,52 @@
 <?php 
-// Importamos el Helper para generar las rutas correctas
 use App\Core\UrlHelper; 
-// Recuperamos datos antiguos si hubo error
 $oldInput = $data['old_input'] ?? [];
 ?>
 
-<div class="row justify-content-center">
-    <div class="col-md-6 col-lg-4">
-        <div class="card shadow-sm border-0">
-            <div class="card-body p-4">
-                <h2 class="text-center mb-4" style="color: var(--color-primary);">Iniciar Sesión</h2>
+<div class="container d-flex justify-content-center">
+    <div class="row w-100">
+        <div class="col-12 d-flex justify-content-center">
+            
+            <div class="login-card-pinterest">
                 
+                <div class="icon-pinterest-circle mb-5">
+                    <span>✨</span> 
+                </div>
+
+                <h2 class="mb-3">Bienvenida</h2>
+                <p class="text-muted mb-5" style="font-family: 'Dancing Script', cursive; font-size: 1.5rem; color: var(--color-text-soft);">
+                    ¡Tu mundo de oportunidades te espera!
+                </p>
+
                 <form action="<?= UrlHelper::base('/login') ?>" method="POST">
-                    <div class="mb-3">
-                        <label for="username_or_email" class="form-label">Usuario o Email</label>
-                        <input type="text" class="form-control" id="username_or_email" name="username_or_email" required
+                    
+                    <div class="mb-4 text-start">
+                        <label for="username" class="form-label">Usuario o Email</label>
+                        <input type="text" class="form-control form-control-pinterest" id="username" name="username_or_email" 
+                               placeholder="Tu.Email@ejemplo.com" required
                                value="<?= htmlspecialchars($oldInput['username_or_email'] ?? '') ?>">
                     </div>
-                    <div class="mb-3">
+
+                    <div class="mb-5 text-start">
                         <label for="password" class="form-label">Contraseña</label>
-                        <input type="password" class="form-control" id="password" name="password" required>
+                        <input type="password" class="form-control form-control-pinterest" id="password" name="password" 
+                               placeholder="••••••••••••" required>
                     </div>
                     
-                    <div class="d-grid gap-2">
-                        <button type="submit" class="btn btn-primary">Entrar</button>
+                    <div class="d-grid gap-2 mb-4">
+                        <button type="submit" class="btn btn-lg btn-login-pinterest shadow-sm">
+                            Ingresar
+                        </button>
                     </div>
                 </form>
 
-                <p class="text-center mt-3">
-                    ¿No tienes cuenta? 
-                    <a href="<?= UrlHelper::base('/registro') ?>">Regístrate aquí</a>
-                </p>
+                <div class="mt-4">
+                    <p class="text-muted small">¿Aún no tienes cuenta?</p>
+                    <a href="<?= UrlHelper::base('/registro') ?>" class="link-pinterest">
+                        Crea tu perfil ahora ✨
+                    </a>
+                </div>
+
             </div>
         </div>
     </div>

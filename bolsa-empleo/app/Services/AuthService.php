@@ -23,6 +23,7 @@ class AuthService
         PostulanteRepositoryInterface $postulanteRepository,
         PersonaRepositoryInterface $personaRepository
     ) {
+        //Principio de Inversión de Dependencias 
         $this->usuarioRepository = $usuarioRepository;
         $this->postulanteRepository = $postulanteRepository;
         $this->personaRepository = $personaRepository;

@@ -1,4 +1,6 @@
 <?php
+// app/Models/Entities/Emprendimiento.php
+
 namespace App\Models\Entities;
 
 class Emprendimiento
@@ -9,12 +11,17 @@ class Emprendimiento
     private string $descripcion;
     // ... otros campos como rubro, estado, web ...
 
-    // Getters
+    // --- Getters ---
     public function getIdEmprendimiento(): ?int { return $this->id_emprendimiento; }
     public function getNombre(): string { return $this->nombre; }
     public function getDescripcion(): string { return $this->descripcion; }
     
-    // Setters
+    // --- EL MÉTODO QUE FALTABA Y CAUSABA EL ERROR ---
+    public function getIdPostulanteEmprendedor(): int { 
+        return $this->id_postulante_emprendedor; 
+    }
+    
+    // --- Setters ---
     public function setIdEmprendimiento(int $id): self { $this->id_emprendimiento = $id; return $this; }
     public function setIdPostulanteEmprendedor(int $id): self { $this->id_postulante_emprendedor = $id; return $this; }
     public function setNombre(string $n): self { $this->nombre = $n; return $this; }

@@ -24,7 +24,7 @@ class Usuario
         $this->activo = true;
     }
 
-    // --- Getters ---
+    // --- Getters --- metodos publicos controlados 
     public function getIdUsuario(): ?int { return $this->id_usuario; }
     public function getUsername(): string { return $this->username; }
     public function getEmail(): string { return $this->email; }

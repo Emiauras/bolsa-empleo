@@ -11,3 +11,7 @@ interface BusquedaStrategyInterface
      */
     public function buscar(array $ofertas, string $termino): array;
 }
+
+//Open/Close, creaamos una Interfaz BusquedaStrategyInterface si queremos añadir un 
+// filtro por ubicación, solo creamos una nueva clase BusquedaPorUbicación el código 
+// principal OfertaController no se toca. 

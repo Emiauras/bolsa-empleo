@@ -15,7 +15,7 @@ use Exception;
 class PostulanteFactory implements PostulanteFactoryInterface
 {
     /**
-     * Crea el objeto específico de Postulante a partir de datos de la DB.
+     * Crea el objeto específico de Postulante a partir de datos de la DB. factory method
      */
     public function createFromDatabaseRow(array $data): Postulante
     {

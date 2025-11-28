@@ -7,7 +7,7 @@ use App\Models\Entities\Postulante; // Se requiere la interfaz base Postulante
 
 /**
  * Define el contrato para el Factory Method que crea objetos Postulante concretos.
- * [cite_start]Es parte del patrón Factory[cite: 118, 119, 120].
+ * [cite_start]Es parte del patrón Factory
  */
 interface PostulanteFactoryInterface
 {

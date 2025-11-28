@@ -1,46 +1,186 @@
 /* public/assets/css/app.css */
 
-/* Paleta de Colores Base */
+/* --- FUENTES IMPORTADAS --- */
+/* Cursiva para títulos, una sans-serif delicada para textos */
+@import url('https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400;700&family=Quicksand:wght@300;400;500;600&display=swap');
+
+/* --- VARIABLES DE COLOR (Paleta Pinterest Girlie) --- */
 :root {
-    --color-primary: #8a2be2; /* Lavanda suave (violeta) */
-    --color-success: #3cb371; /* Verde menta/esmeralda para botones de acción */
-    --color-pink: #ffb6c1; /* Rosa claro para fondos o detalles */
-    --color-secondary: #a9a9a9; /* Gris suave */
+    --bg-main-light: #fefcfc;        /* Fondo principal (casi blanco) */
+    --bg-gradient-start: #e0bbe4;   /* Inicio degradado lila suave */
+    --bg-gradient-end: #957dad;     /* Fin degradado lila más oscuro */
+    --color-primary-lila: #8a2be2;  /* Lila vivo (Blue Violet) */
+    --color-text-dark: #6e44ff;     /* Lila oscuro para texto (no negro) */
+    --color-text-soft: #a8a2a7;     /* Gris/lila claro para descripciones */
+    --color-accent-pink: #ffc2d1;   /* Rosa pastel para detalles */
+    --color-white-translucent: rgba(255, 255, 255, 0.9); /* Blanco semitransparente */
+    
+    --shadow-soft-lila: 0 10px 30px rgba(138, 43, 226, 0.15); /* Sombra lila suave */
 }
 
-/* Estilos de la Navegación */
-.navbar {
-    background-color: var(--color-primary) !important; /* Barra principal en Lavanda */
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-.navbar-brand, .nav-link {
-    color: white !important;
-}
-
-/* Botón Principal (Registro/Acción) */
-.btn-success {
-    background-color: var(--color-success);
-    border-color: var(--color-success);
-    transition: background-color 0.3s;
-}
-.btn-success:hover {
-    background-color: #3cb371; /* Tono ligeramente más oscuro */
-    border-color: #3cb371;
+/* --- ESTILOS GENERALES Y FONDO --- */
+body {
+    font-family: 'Quicksand', sans-serif; /* Fuente limpia y redonda */
+    color: var(--color-text-dark);
+    background: linear-gradient(-45deg, var(--bg-gradient-start), var(--bg-gradient-end), var(--bg-gradient-start));
+    background-size: 400% 400%;
+    animation: gradientBG 15s ease infinite; /* Fondo animado */
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
 }
 
-/* Estilos de Autenticación (Fondo Suave) */
-body.auth-page {
-    background-color: var(--color-pink) !important; 
-}
-.auth-container {
-    background-color: white;
-    border-radius: 15px;
-    padding: 30px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+@keyframes gradientBG {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
 }
 
-/* Títulos */
+main { flex: 1; } /* Para que el footer se quede abajo */
+
+/* --- TÍTULOS Y FUENTES --- */
+h1, h2, h3, h4, h5, .navbar-brand {
+    font-family: 'Dancing Script', cursive; /* Fuente cursiva elegante */
+    color: var(--color-text-dark);
+    font-weight: 700;
+}
 h2 {
-    color: var(--color-primary);
+    color: var(--color-primary-lila);
+    font-size: 2.8rem; /* Un poco más grande para el login */
+    text-shadow: 2px 2px 0px var(--color-white-translucent);
+}
+
+/* --- NAVEGACIÓN --- */
+.navbar {
+    background-color: var(--bg-main-light) !important; /* Navbar en blanco roto */
+    border-bottom: 2px solid var(--color-accent-pink); /* Borde rosa suave */
+    box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+}
+.navbar-brand {
+    font-size: 2.2rem;
+    color: var(--color-primary-lila) !important;
+}
+.nav-link {
+    color: var(--color-text-dark) !important;
+    font-weight: 500;
+    text-transform: capitalize; /* Mayúscula inicial */
+    font-size: 1.05rem;
+    letter-spacing: 0.5px;
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    transition: all 0.2s ease;
+}
+.nav-link:hover {
+    background-color: var(--color-accent-pink);
+    color: var(--color-white) !important; /* Texto blanco al pasar el mouse */
+}
+
+/* --- TARJETA DE LOGIN (Glassmorphism sutil) --- */
+.login-card-pinterest {
+    background: var(--color-white-translucent); /* Fondo blanco roto semi-transparente */
+    backdrop-filter: blur(8px); /* Efecto vidrio suave */
+    border-radius: 30px; /* Bordes muy redondeados */
+    border: 2px solid rgba(255, 255, 255, 0.7); /* Borde blanco sutil */
+    box-shadow: var(--shadow-soft-lila); /* Sombra lila más marcada */
+    padding: 3.5rem 2.5rem; /* Padding más vertical que horizontal */
+    width: 100%;
+    max-width: 420px; /* Caja más compacta */
+    margin-top: 5rem;
+    margin-bottom: 5rem;
+    text-align: center;
+    position: relative; /* Para los brillos */
+    overflow: hidden;
+}
+
+/* --- ICONO SUPERIOR --- */
+.icon-pinterest-circle {
+    width: 80px; height: 80px;
+    background: linear-gradient(45deg, var(--color-accent-pink), var(--bg-gradient-start));
+    border-radius: 50%;
+    margin: -100px auto 30px; /* Subirlo para que "salga" de la caja */
+    display: flex; align-items: center; justify-content: center;
+    box-shadow: var(--shadow-soft-lila);
+    position: relative;
+    z-index: 2;
+    border: 3px solid var(--bg-main-light);
+}
+.icon-pinterest-circle span {
+    font-size: 40px;
+    line-height: 1; /* Para centrar el emoji */
+    filter: drop-shadow(0 2px 3px rgba(0,0,0,0.1));
+}
+
+/* --- INPUTS Y LABELS --- */
+.form-label {
+    color: var(--color-text-dark);
+    font-weight: 500;
+    font-size: 1.05rem;
+    margin-bottom: 0.5rem;
+}
+.form-control-pinterest {
+    border-radius: 25px; /* Más redondeados */
+    border: 1px solid var(--color-accent-pink); /* Borde rosa suave */
+    padding: 12px 20px;
+    background-color: var(--bg-main-light);
+    color: var(--color-text-dark);
+    font-size: 1.1rem;
+    transition: all 0.3s ease;
+}
+.form-control-pinterest::placeholder {
+    color: var(--color-text-soft);
+    font-style: italic;
+}
+.form-control-pinterest:focus {
+    border-color: var(--color-primary-lila);
+    box-shadow: 0 0 0 0.25rem rgba(138, 43, 226, 0.2); /* Sombra lila en focus */
+    outline: none;
+}
+
+/* --- BOTÓN DE LOGIN --- */
+.btn-login-pinterest {
+    border-radius: 25px; /* Muy redondeado */
+    background: linear-gradient(90deg, var(--color-primary-lila), var(--bg-gradient-end));
+    border: none;
+    color: var(--bg-main-light); /* Texto blanco roto */
+    padding: 12px 30px;
+    font-weight: 700;
+    font-size: 1.2rem;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    box-shadow: var(--shadow-soft-lila);
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+.btn-login-pinterest:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 15px 35px rgba(138, 43, 226, 0.3);
+    color: var(--bg-main-light);
+}
+
+/* --- ENLACES (Registro) --- */
+.link-pinterest {
+    color: var(--color-primary-lila);
     font-weight: 600;
+    text-decoration: none;
+    transition: color 0.2s ease;
+}
+.link-pinterest:hover {
+    color: var(--color-text-dark);
+    text-decoration: underline;
+}
+
+/* --- MENSAJES DE ALERTA --- */
+.alert {
+    border-radius: 15px;
+    border: none;
+    font-weight: 500;
+    padding: 1rem 1.5rem;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+}
+.alert-success {
+    background-color: #d1e7dd; /* Verde pastel */
+    color: #0f5132;
+}
+.alert-danger {
+    background-color: #f8d7da; /* Rosa pastel de error */
+    color: #842029;
 }

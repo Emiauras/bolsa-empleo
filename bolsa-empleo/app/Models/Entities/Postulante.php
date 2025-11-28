@@ -13,6 +13,6 @@ interface Postulante
     
     public function getIdUsuario(): int;
     public function setIdUsuario(int $id_usuario): self;
-    
+    //Polimorfismo 
     public function getTipo(): int; 
 }
